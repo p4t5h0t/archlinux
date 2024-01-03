@@ -47,7 +47,7 @@ mkdir /mnt/boot
 mount -L boot /mnt/boot
 
 # Install Arch Linux with additional packages (linux, linux-firmware, networkmanager, vim)
-pacstrap /mnt base base-devel linux linux-firmware networkmanager vim
+pacstrap /mnt base base-devel linux linux-firmware linux-headers networkmanager vim
 
 # Generate the fstab file with UUIDs
 genfstab -U /mnt >> /mnt/etc/fstab
@@ -69,12 +69,12 @@ echo "LANG=de_DE.UTF-8" > /etc/locale.conf
 echo "KEYMAP=de-latin1" > /etc/vconsole.conf
 
 # Set the hostname
-echo "myarch" > /etc/hostname
+echo "vmarch" > /etc/hostname
 
 # Edit the hosts file
 echo "127.0.0.1    localhost" >> /etc/hosts
 echo "::1          localhost" >> /etc/hosts
-echo "127.0.1.1    myarch.localdomain myarch" >> /etc/hosts
+echo "127.0.1.1    vmarch.localdomain vmarch" >> /etc/hosts
 
 # Set the root user password
 passwd
@@ -85,7 +85,7 @@ grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=grub
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Install additional packages
-pacman -S acpid avahi bash-completion bluez bluez-utils cifs-utils cups curl dosfstools fuse2fs git hplip linux-headers network-manager-applet nfs-utils ntfs-3g reflector samba wget zsh
+pacman -S acpid avahi bash-completion bluez bluez-utils cifs-utils cups curl dosfstools fuse2fs git hplip network-manager-applet nfs-utils ntfs-3g reflector samba wget zsh
 
 # Enable services
 systemctl enable acpid
