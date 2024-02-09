@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Arch Linux Installation Script for automate most of the Install Process.
+# Read the Preparation in the Readme.md before!
 ###########################################################################
 # You need to customize various settings at the beginning of the script
 # (partitioning, locale, keyboard layout, hostname, etc.) to suit your needs.
