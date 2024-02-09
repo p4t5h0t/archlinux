@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# Arch Linux Installation Script
-# This script automates the installation of Arch Linux.
-# Please make sure to customize the settings at the beginning of the script
+# Arch Linux Installation Script for automate most of the Install Process.
+###########################################################################
+# You need to customize various settings at the beginning of the script
 # (partitioning, locale, keyboard layout, hostname, etc.) to suit your needs.
-
+###########################################################################
+###########################################################################
 # How to run this script:
 # 1. Boot your computer from a bootable Arch Linux installation medium.
 # 2. Ensure an internet connection is available (e.g., Ethernet).
@@ -13,6 +14,8 @@
 # 5. Copy this script to your target system (e.g., using wget).
 # 6. Give execute permissions to the script: chmod +x install_script.sh
 # 7. Run the script: ./install_script_0.1.sh
+###########################################################################
+
 
 # Partition the disk with gdisk and label partitions (customize to your needs)
 # !!! Delete Existing partition table !!! Set an BTRFS Partition Layout !!!
