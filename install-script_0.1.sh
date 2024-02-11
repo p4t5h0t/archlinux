@@ -29,24 +29,28 @@
 
 ##########################################################################################
 # S E T   V A R I A B L E S
-# Hard Disk and Partitions
+# Hard disk and partitions
 disk="/dev/sda" # The disk, you want to install Arch
 part1=$disk"1"  # Partition 1, usually the boot partition
 part2=$disk"2"  # Partition 2, usually the root partition
 part3=$disk"3"  # Partition 3, usually the home partition, if you want to separate
 part4=$disk"4"  # Partition 4, another partition, if you want to separate different parts
+
+# Machine settings
+hostname="arch"
 ##########################################################################################
 
 
 ##########################################################################################
 # P A R T I O N S   T H E   D I S K ( S )
-# Partition the disk with gdisk and label partitions (customize to your needs)
-# Multiple variations listed below. All variations without Swap-Partition.
-##########################################################################################
-# OPTION 1
-# Delete existing partitions and create a new partition Table.
+# Partition the disk with gdisk and label partitions (customize to your needs). If you
+# have a existing partition table with partitions what you don't want to delete and only
+# reinstall the system on an existing partition, skip this part.
+#
+# Delete existing partitions and create a new partition Table. Two options listed below.
 # ATTENTION: DATA LOSS! Existing data will be deleted!
-
+##########################################################################################
+# Variation with ONE partition for the whole system (no separate home partition)
 :<<COMMENT
 gdisk $disk <<EOF
 o      # Create a new GPT partition table (and deleting existing one)
@@ -66,20 +70,120 @@ Y      # Confirm the operation
 EOF
 COMMENT
 ##########################################################################################
+# Variation with TWO partitions (root and home partition). Set the partition size for
+# your needs.
+:<<COMMENT
+gdisk $disk <<EOF
+o      # Create a new GPT partition table (and deleting existing one)
+Y      # Confirm the operation
+n      # Create a new partition (boot), use default start sector
++512M  # Size of the boot partition
+EF00   # EF00 Hex code for EFI System Partition
+c      # Set label for the boot partition
+boot   # Label for the boot partition
+n      # Create a new partition (root), use default start sector
++20G   # Set the size for your needs
+8300   # 8300 Hex code for Linux filesystem
+c      # Set label for the root partition
+root   # Label for the root partition
+n      # Create a new partition (home), use default start sector
+       # Use the rest of the available space for the home partition or set a size
+8300   # 8300 Hex code for Linux filesystem
+c      # Set label for the home partition
+home   # Label for the home partition
+w      # Write changes to disk
+Y      # Confirm the operation
+EOF
+COMMENT
+##########################################################################################
 
+
+##########################################################################################
+# F O R M A T   A N D   M O U N T   T H E   D I S K
+# Format the partitions, mount and create the needed folders. Three options listed below.
+##########################################################################################
+# One partition (root) formatted with BTRFS.
+:<<COMMENT
 # Format the boot partition with FAT32 and label
-mkfs.fat -F32 -n boot /dev/sda1
+mkfs.fat -F32 -n boot $part1
 
 # Format the root partition with ext4 and label
-mkfs.ext4 -L root /dev/sda2
+mkfs.btrfs -L root $part2
+
+# Mount the root partition using its label and create the subvolumes
+mount -L root /mnt
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@home
+btrfs subvolume create /mnt/@root
+btrfs subvolume create /mnt/@cache
+btrfs subvolume create /mnt/@log
+btrfs subvolume create /mnt/@spool
+btrfs subvolume create /mnt/@tmp
+btrfs subvolume create /mnt/@srv
+btrfs subvolume create /mnt/@snapshots
+
+# Unmount the root partition and mount it with the correct settings
+umount /mnt
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@ $part2 /mnt
+
+# Create the folder for the subvolumes and mount them
+mkdir -p /mnt/{home,root,var/cache,var/log,var/spool,tmp,srv,snapshots}
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@home $part2 /mnt/home
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@root $part2 /mnt/root
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@cache $part2 /mnt/var/cache
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@log $part2 /mnt/var/log
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@spool $part2 /mnt/var/spool
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@tmp $part2 /mnt/tmp
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@srv $part2 /mnt/srv
+mount -o defaults,noatime,compress=zstd,commit=120,subvol=@snapshots $part2 /mnt/snapshots
+
+# Create the boot directory and mount the boot partition using its label
+mkdir -p /mnt/boot/efi
+mount -L boot /mnt/boot/efi
+COMMENT
+##########################################################################################
+# One partition (root) formatted with EXT4.
+:<<COMMENT
+# Format the boot partition with FAT32 and label
+mkfs.fat -F32 -n boot $part1
+
+# Format the root partition with ext4 and label
+mkfs.ext4 -L root $part2
 
 # Mount the root partition using its label
 mount -L root /mnt
 
 # Create the boot directory and mount the boot partition using its label
-mkdir /mnt/boot
-mount -L boot /mnt/boot
+mkdir -p /mnt/boot/efi
+mount -L boot /mnt/boot/efi
+COMMENT
+##########################################################################################
+# Two partitions (root and home) formatted with EXT4.
+:<<COMMENT
+# Format the boot partition with FAT32 and label
+mkfs.fat -F32 -n boot $part1
 
+# Format the root partition with ext4 and label
+mkfs.ext4 -L root $part2
+
+# Format the home partition with ext4 and label
+mkfs.ext4 -L home $part3
+
+# Mount the root partition using its label
+mount -L root /mnt
+
+# Create the boot directory and mount the boot partition using its label
+mkdir -p /mnt/boot/efi
+mount -L boot /mnt/boot/efi
+
+# Create the home directory and mount the home partition using its label
+mkdir -p /mnt/home
+mount -L home /mnt/home
+COMMENT
+##########################################################################################
+
+
+##########################################################################################
 # Install Arch Linux with additional packages (linux, linux-firmware, networkmanager, vim)
 pacstrap /mnt base base-devel linux linux-firmware linux-headers networkmanager vim
 
@@ -103,12 +207,12 @@ echo "LANG=de_DE.UTF-8" > /etc/locale.conf
 echo "KEYMAP=de-latin1" > /etc/vconsole.conf
 
 # Set the hostname
-echo "vmarch" > /etc/hostname
+echo $hostname > /etc/hostname
 
 # Edit the hosts file
 echo "127.0.0.1    localhost" >> /etc/hosts
 echo "::1          localhost" >> /etc/hosts
-echo "127.0.1.1    vmarch.localdomain vmarch" >> /etc/hosts
+echo "127.0.1.1    $hostname.localdomain $hostname" >> /etc/hosts
 
 # Set the root user password
 passwd
