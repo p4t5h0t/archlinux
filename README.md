@@ -39,6 +39,41 @@ After that, check the connection with
 ```
 ping archlinux.org
 ```
+## Check the hard disks
+Check the name of the hard disk, you want to install Linux. You can check it with
+```
+lsblk
+```
+or
+```
+fdisk -l
+```
+Notice the name for the script to edit the partitioning for your purpose. For example `sda`
+> [!NOTE]
+> Example with `lsblk`
+> ```
+> [pat@patmac ~]$ lsblk
+> NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+> sda      8:0    0  113G  0 disk 
+> ├─sda1   8:1    0 1000M  0 part /boot/efi
+> └─sda2   8:2    0  112G  0 part /
+> sdb      8:16   1    0B  0 disk 
+> ```
+> Example with fdisk -l
+> ```
+> [pat@patmac ~]$ fdisk -l
+> Festplatte /dev/sda: 113 GiB, 121332826112 Bytes, 236978176 Sektoren
+> Festplattenmodell: APPLE SSD SD0128
+> Einheiten: Sektoren von 1 * 512 = 512 Bytes
+> Sektorgröße (logisch/physikalisch): 512 Bytes / 4096 Bytes
+> E/A-Größe (minimal/optimal): 4096 Bytes / 4096 Bytes
+> Festplattenbezeichnungstyp: gpt
+> Festplattenbezeichner: 48CDADDE-4D18-416F-ABAE-F606AD273A69
+> 
+> Gerät       Anfang      Ende  Sektoren Größe Typ
+> /dev/sda1     4096   2052095   2048000 1000M EFI-System
+> /dev/sda2  2052096 236974814 234922719  112G Linux-Dateisystem
+> ```
 
 ## Install `git` and download the repo
 ```
