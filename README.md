@@ -48,7 +48,7 @@ or
 ```
 fdisk -l
 ```
-Notice the name for the script to edit the partitioning for your purpose. For example `sda`
+Notice the name for the script to edit the partitioning for your purpose. For example `sda` or `nvme0n1`
 > [!NOTE]
 > Example with `lsblk`
 > ```
