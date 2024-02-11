@@ -1,41 +1,71 @@
 #!/bin/bash
-
+##########################################################################################
+# I N T R O D U C T I O N
+#
 # Arch Linux Installation Script for automate most of the Install Process.
 # Read the Preparation in the Readme.md before!
-###########################################################################
-# You need to customize various settings at the beginning of the script
-# (partitioning, locale, keyboard layout, hostname, etc.) to suit your needs.
-###########################################################################
-###########################################################################
-# How to run this script:
-# 1. Boot your computer from a bootable Arch Linux installation medium.
-# 2. Ensure an internet connection is available (e.g., Ethernet).
-# 3. Set the keyboard layout to de-latin1 (loadkeys de-latin1)
+#
+# You need to customize various settings of the script (partitioning, locale, keyboard
+# layout, hostname, installation packages, etc.) to suit your needs. Read the whole script
+# and edit the settings before the installation! To avoid errors, all command blocks are
+# commented out with ":<<COMMENT" at the beginning and "COMMENT" at the end. To enable
+# the needed blocks, comment out the lines with an Hashtag.
+##########################################################################################
+
+
+##########################################################################################
+# I N S T R U C T I O N
+#
+# 1. If you didn*t read the Readme.md, read it first!
+# 2. Edit the variables for your system
+# 3. Comment in/out, what you want to install. Details in the sections
+#
 # 4. Mount your target system at /mnt, e.g., mount /dev/sdX /mnt.
 # 5. Copy this script to your target system (e.g., using wget).
 # 6. Give execute permissions to the script: chmod +x install_script.sh
 # 7. Run the script: ./install_script_0.1.sh
-###########################################################################
+##########################################################################################
 
 
+##########################################################################################
+# S E T   V A R I A B L E S
+# Hard Disk and Partitions
+disk="/dev/sda" # The disk, you want to install Arch
+part1=$disk"1"  # Partition 1, usually the boot partition
+part2=$disk"2"  # Partition 2, usually the root partition
+part3=$disk"3"  # Partition 3, usually the home partition, if you want to separate
+part4=$disk"4"  # Partition 4, another partition, if you want to separate different parts
+##########################################################################################
+
+
+##########################################################################################
+# P A R T I O N S   T H E   D I S K ( S )
 # Partition the disk with gdisk and label partitions (customize to your needs)
-# !!! Delete Existing partition table !!! Set an BTRFS Partition Layout !!!
-gdisk /dev/sda <<EOF
-o     # Create a new GPT partition table
-Y     # Confirm the operation
-n     # Create a new partition (boot), use default start sector
-+512M # Size of the boot partition
-EF00  # EF00 Hex code for EFI System Partition
-c     # Set label for the boot partition
-boot  # Label for the boot partition
-n     # Create a new partition (root), use default start sector
-      # Use the rest of the available space for the root partition
-8300  # 8300 Hex code for Linux filesystem
-c     # Set label for the root partition
-root  # Label for the root partition
-w     # Write changes to disk
-Y     # Confirm the operation
+# Multiple variations listed below. All variations without Swap-Partition.
+##########################################################################################
+# OPTION 1
+# Delete existing partitions and create a new partition Table.
+# ATTENTION: DATA LOSS! Existing data will be deleted!
+
+:<<COMMENT
+gdisk $disk <<EOF
+o      # Create a new GPT partition table (and deleting existing one)
+Y      # Confirm the operation
+n      # Create a new partition (boot), use default start sector
++512M  # Size of the boot partition
+EF00   # EF00 Hex code for EFI System Partition
+c      # Set label for the boot partition
+boot   # Label for the boot partition
+n      # Create a new partition (root), use default start sector
+       # Use the rest of the available space for the root partition
+8300   # 8300 Hex code for Linux filesystem
+c      # Set label for the root partition
+root   # Label for the root partition
+w      # Write changes to disk
+Y      # Confirm the operation
 EOF
+COMMENT
+##########################################################################################
 
 # Format the boot partition with FAT32 and label
 mkfs.fat -F32 -n boot /dev/sda1
