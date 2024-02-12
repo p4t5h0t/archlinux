@@ -49,11 +49,17 @@ gdisk $disk <<EOF
 o      # Create a new GPT partition table (and deleting existing one)
 Y      # Confirm the operation
 n      # Create a new partition (boot), use default start sector
+       # Default partition number
+
+       # Default start sector
 +1024M  # Size of the boot partition
 EF00   # EF00 Hex code for EFI System Partition
 c      # Set label for the boot partition
 boot   # Label for the boot partition
 n      # Create a new partition (root), use default start sector
+       # Default partition number
+       
+       # Default start sector
        # Use the rest of the available space for the root partition
 8300   # 8300 Hex code for Linux filesystem
 c      # Set label for the root partition
