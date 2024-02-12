@@ -44,59 +44,19 @@ part3=$disk"3"  # Partition 3, usually the home partition, if you want to separa
 part4=$disk"4"  # Partition 4, another partition, if you want to separate different parts
 ###########################################################################################
 # Variation with ONE partition for the whole system (no separate home partition)
-sgdisk -o $disk
-sgdisk -n 0:0:+1024M -t 0:ef00 -c 0:boot $disk
-sgdisk -n 0:0:0 -t 0:8300 -c 0:root $disk
-
-:<<COMMENT
-gdisk $disk <<EOF
-o      # Create a new GPT partition table (and deleting existing one)
-Y      # Confirm the operation
-n      # Create a new partition (boot), use default start sector
-       # Default partition number
-
-       # Default start sector
-+1024M  # Size of the boot partition
-EF00   # EF00 Hex code for EFI System Partition
-c      # Set label for the boot partition
-boot   # Label for the boot partition
-n      # Create a new partition (root), use default start sector
-       # Default partition number
-       
-       # Default start sector
-       # Use the rest of the available space for the root partition
-8300   # 8300 Hex code for Linux filesystem
-c      # Set label for the root partition
-root   # Label for the root partition
-w      # Write changes to disk
-Y      # Confirm the operation
-EOF
-COMMENT
+#:<<COMMENT
+sgdisk -o $disk # Create a new GPT partition table (and deleting existing one)
+sgdisk -n 0:0:+1024M -t 0:ef00 -c 0:boot $disk # Create a boot EFI boot partition (1024 MB)
+sgdisk -n 0:0:0 -t 0:8300 -c 0:root $disk # Create a root partition with the full size
+#COMMENT
 ###########################################################################################
 # Variation with TWO partitions (root and home partition). Set the partition size for
 # your needs.
 :<<COMMENT
-gdisk $disk <<EOF
-o      # Create a new GPT partition table (and deleting existing one)
-Y      # Confirm the operation
-n      # Create a new partition (boot), use default start sector
-+1024M  # Size of the boot partition
-EF00   # EF00 Hex code for EFI System Partition
-c      # Set label for the boot partition
-boot   # Label for the boot partition
-n      # Create a new partition (root), use default start sector
-+20G   # Set the size for your needs
-8300   # 8300 Hex code for Linux filesystem
-c      # Set label for the root partition
-root   # Label for the root partition
-n      # Create a new partition (home), use default start sector
-       # Use the rest of the available space for the home partition or set a size
-8300   # 8300 Hex code for Linux filesystem
-c      # Set label for the home partition
-home   # Label for the home partition
-w      # Write changes to disk
-Y      # Confirm the operation
-EOF
+sgdisk -o $disk # Create a new GPT partition table (and deleting existing one)
+sgdisk -n 0:0:+1024M -t 0:ef00 -c 0:boot $disk # Create a boot EFI boot partition (1024 MB)
+sgdisk -n 0:0:+20G -t 0:8300 -c 0:root $disk # Create a root partition (20 GB)
+sgdisk -n 0:0:0 -t 0:8300 -c 0:home $disk # Create a home partition with the full size
 COMMENT
 ###########################################################################################
 
@@ -185,7 +145,7 @@ mount -L home /mnt/home
 COMMENT
 ###########################################################################################
 
-
+:<< COMMENT
 ###########################################################################################
 # B A S I C   I N S T A L L A T I O N
 # Basic installation process of Arch Linux
@@ -210,7 +170,7 @@ $base_pkgs \
 $kernel_pkgs \ 
 $network_pkgs \
 $utilities_pkgs
-
+COMMENT
 :<< COMMENT
 # Generate the fstab file with Labels
 genfstab -L /mnt >> /mnt/etc/fstab
