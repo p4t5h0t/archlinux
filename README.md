@@ -1,6 +1,9 @@
 # Installation Script for Arch Linux
 *This repository contains different Installation Scripts to install Arch Linux.*
 
+> [!CAUTION]
+> The Scripts in this Repo are WIP. Scripts are acutally not tested and you use it on your own Risk.
+
 Before run the Scripts you need to prepare the installation. At first, you need do download the Arch Linux ISO from [Arch Linux](https://archlinux.org/download/)
 Create a bootable device (for example with [Ventoy](https://www.ventoy.net/en/index.html)) (memory stick) with the ISO and boot the computer from the stick. The following preparations are inherited from the 
 [Arch Wiki Installation Guide](https://wiki.archlinux.org/title/installation_guide) and were slightly edited.
