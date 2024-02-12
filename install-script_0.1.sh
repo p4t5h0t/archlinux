@@ -44,6 +44,10 @@ part3=$disk"3"  # Partition 3, usually the home partition, if you want to separa
 part4=$disk"4"  # Partition 4, another partition, if you want to separate different parts
 ###########################################################################################
 # Variation with ONE partition for the whole system (no separate home partition)
+sgdisk -o $disk
+sgdisk -n 0:0:+1024M -t 0:ef00 -c 0:boot $disk
+sgdisk -n 0:0:0 -t 0:8300 -c 0:root $disk
+
 :<<COMMENT
 gdisk $disk <<EOF
 o      # Create a new GPT partition table (and deleting existing one)
