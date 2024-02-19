@@ -1,3 +1,5 @@
+# Work in Progress...
+<!-- 
 # Installation Script for Arch Linux
 *This repository contains different Installation Scripts to install Arch Linux.*
 
@@ -87,3 +89,4 @@ git XXX
 
 ## Run the script
 ....
+-->
