@@ -241,7 +241,6 @@ fi
 
 
 # SCRIPT TESTED UNTIL CHROOT. AFTER CHROOT THE SCRIPT STOPS
-:<<COMMENT
 # Chroot into the new system
 arch-chroot /mnt
 
@@ -344,4 +343,3 @@ sleep 5
 exit
 umount -R /mnt
 reboot
-COMMENT
